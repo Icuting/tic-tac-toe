@@ -50,17 +50,21 @@ class PlayField( var sizeField: Int = 3, var movePlayer: String) {
 
     @Composable
     fun generateBox() {
-        val quantityBox = sizeField*sizeField
         val widthRow = ((sizeField * 80))
-        var stateBoxList by remember {
-            mutableStateOf(
-                Array(sizeField) {
-                    Array(sizeField) {
-                        false
-                    }
-                }
-            )
+        var stateBoxList = remember {
+            mutableStateListOf<Array<Boolean>>()
         }
+
+        LaunchedEffect(Unit) {
+            stateBoxList.addAll(MutableList(sizeField){Array(sizeField) {false} })
+        }
+
+        val updateList = {
+            val temp = stateBoxList.toList()
+            stateBoxList.clear()
+            stateBoxList.addAll(temp)
+        }
+
         stateBoxList.forEachIndexed { indexRow, row ->
             Row(
 
@@ -76,7 +80,9 @@ class PlayField( var sizeField: Int = 3, var movePlayer: String) {
                                 onClick = {
                                     if (!stateBox) {
                                         stateBoxList[indexRow][indexBox] = true
-                                    }},
+                                        updateList()
+                                    }
+                                },
                                 selected = stateBox
                             ),
                     ) {
