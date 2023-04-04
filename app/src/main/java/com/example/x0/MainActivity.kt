@@ -50,13 +50,13 @@ class PlayField( var sizeField: Int = 3, var movePlayer: String) {
 
     @Composable
     fun generateBox() {
-        val widthRow = ((sizeField * 80))
+        var statePlayer by remember { mutableStateOf("X") }
         var stateBoxList = remember {
-            mutableStateListOf<Array<Boolean>>()
+            mutableStateListOf<Array<String>>()
         }
 
         LaunchedEffect(Unit) {
-            stateBoxList.addAll(MutableList(sizeField){Array(sizeField) {false} })
+            stateBoxList.addAll(MutableList(sizeField){Array(sizeField) {""} })
         }
 
         val updateList = {
@@ -78,46 +78,28 @@ class PlayField( var sizeField: Int = 3, var movePlayer: String) {
                             .border(2.dp, Color.LightGray)
                             .selectable(
                                 onClick = {
-                                    if (!stateBox) {
-                                        stateBoxList[indexRow][indexBox] = true
+                                    if (stateBox === "") {
+                                        stateBoxList[indexRow][indexBox] = statePlayer
                                         updateList()
+                                        statePlayer = if (statePlayer == "X") {
+                                            "0"
+                                        } else {
+                                            "X"
+                                        }
                                     }
                                 },
-                                selected = stateBox
+                                selected = stateBox.toBoolean()
                             ),
                     ) {
-                        if(stateBox) {
-                            Image(painter = painterResource(R.drawable.x), contentDescription = "x")
+                        when(stateBox) {
+                            "X" -> Image(painter = painterResource(R.drawable.x), contentDescription = "x")
+                            "0" -> Image(painter = painterResource(R.drawable.o), contentDescription = "0")
+                            else -> null
                         }
                     }
                 }
             }
         }
-
-//        Row(
-//            Modifier.fillMaxWidth()
-//        ) {
-//            stateBoxList.forEachIndexed { index, stateBox ->
-//                Box(
-//                    Modifier
-//                        .width(80.dp)
-//                        .height(80.dp)
-//                        .padding(2.dp)
-//                        .border(2.dp, Color.LightGray)
-//                        .selectable(
-//                            onClick = {
-//                                if (!stateBox) {
-//                                    newArray[index] = true
-//                                    stateBoxList = newArray
-//                                }},
-//                            selected = stateBox
-//                        ),
-//                ) {
-//                    if(stateBox) {
-//                        Image(painter = painterResource(R.drawable.x), contentDescription = "x")
-//                    }
-//                }
-//            }
     }
 
     @Composable
